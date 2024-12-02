@@ -35,6 +35,24 @@ def process_data(data):
     return df
 
 
+def fetch_stats(df, user):
+    
+    if user != 'Overall':
+        df = df[df['users'] == user]
+
+    messages = df.messages
+    num_messages = messages.shape[0]
+    num_media_shared = df[df.messages == ' <Media omitted>\n'].shape[0]
+    words = []
+    for message in messages:
+        if message != ' <Media omitted>\n':
+            words.extend(message.split())
+
+    num_words = len(words)
+
+    return num_messages, num_words, num_media_shared
+
+
 if __name__ == '__main__':
     with open('chat.txt', 'r') as  chat:
         data = chat.read()
