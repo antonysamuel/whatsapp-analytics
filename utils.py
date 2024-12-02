@@ -1,6 +1,7 @@
 import pandas as pd
 import re
-
+from urlextract import URLExtract
+extract = URLExtract()
 
 def process_data(data):
     pattern = r'\d{1,2}\/\d{1,2}\/\d{2,4},\s\d{1,2}:\d{2}\s[a-z]{2}\s-\s'
@@ -33,6 +34,29 @@ def process_data(data):
     df['hour'] = df['message_date'].dt.hour
 
     return df
+
+
+def fetch_stats(df, user):
+    
+    if user != 'Overall':
+        df = df[df['users'] == user]
+
+    messages = df.messages
+    num_messages = messages.shape[0]
+    num_media_shared = df[df.messages == ' <Media omitted>\n'].shape[0]
+    words = []
+    for message in messages:
+        if message != ' <Media omitted>\n':
+            words.extend(message.split())
+
+    num_words = len(words)
+
+    urls = []
+    for message in messages:
+        urls.extend(extract.find_urls(message))
+    num_urls = len(urls)
+
+    return num_messages, num_words, num_media_shared, num_urls
 
 
 if __name__ == '__main__':
