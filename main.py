@@ -1,5 +1,6 @@
 import utils
 import streamlit as st
+from matplotlib import pyplot as plt
 
 st.sidebar.title("Whatsapp Chat Analysis")
 uploaded_file = st.sidebar.file_uploader("Upload chat text file", "txt")
@@ -43,4 +44,24 @@ if uploaded_file is not None:
     with col4:
         st.header("Links Shared")
         st.title(num_urls)
+
+    if current_user == 'Overall':
+        st.title("Most Busy Users")
+        busy_users, busy_percent = utils.get_busy_users(df)
+        fig, ax = plt.subplots()
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            ax.bar(busy_users.index, busy_users.values)
+            plt.xticks(rotation = 'vertical')
+            st.pyplot(fig)
+        with col2:
+            st.dataframe(busy_percent)
+
+    st.title("Word Cloud")
+    wordcloud = utils.create_wordcloud(current_user, df)
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud)
+    st.pyplot(fig)
 

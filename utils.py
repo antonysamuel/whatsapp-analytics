@@ -1,6 +1,9 @@
 import pandas as pd
 import re
 from urlextract import URLExtract
+from wordcloud import WordCloud
+
+
 extract = URLExtract()
 
 def process_data(data):
@@ -59,8 +62,22 @@ def fetch_stats(df, user):
     return num_messages, num_words, num_media_shared, num_urls
 
 
+def get_busy_users(df):
+    busy_users = df.users.value_counts()
+    busy_percent = round(busy_users / df.shape[0] * 100 , 2).reset_index().rename(columns = {'users': 'name', 'count': 'precent'})
+    return busy_users, busy_percent
+
+def create_wordcloud(user, df):
+    if user != 'Overall':
+        df = df[df['users'] == user]
+
+    words = df.messages.apply(lambda x: '' if x == ' <Media omitted>\n' else x).str.cat(sep = '') 
+    wordcloud = WordCloud(height= 500, width= 500, min_font_size=10).generate(words)
+    return wordcloud
+
+
 if __name__ == '__main__':
     with open('chat.txt', 'r') as  chat:
         data = chat.read()
         df = process_file(data)
-        print(df)
+        
